@@ -17,6 +17,7 @@ Uses ANSI colours, so it follows your terminal palette (pairs well with Claude's
   `/usage` command and tools like claudometer use. The script reads the Claude Code OAuth token
   from the macOS keychain, caches the answer for 60 seconds and refreshes it in a background
   process, so rendering takes a few milliseconds and never waits on the network.
+  Both styles source this from `usage.sh`, so the token and endpoint live in one place.
 - Every `weekly` row the server returns is printed with the server's own label, so new
   per-model buckets show up without changes.
 - If the fetch fails it keeps the last cached figures, or falls back to the overall weekly
@@ -33,8 +34,8 @@ git clone git@github.com:fabioelizandro/claude-statusline.git ~/claude-statuslin
 ~/claude-statusline/install.sh neon     # neon style, see below
 ```
 
-Or set it up by hand: copy `statusline.sh` somewhere, make it executable, and add to
-`~/.claude/settings.json`:
+Or set it up by hand: copy the style you want and `usage.sh` into the same directory, make the
+style executable, and point `~/.claude/settings.json` at it:
 
 ```json
 { "statusLine": { "type": "command", "command": "/path/to/statusline.sh" } }
@@ -57,10 +58,14 @@ A neon take on the same data, plus the git branch and the 5-hour window:
 - The model name drops its parenthetical (so "Opus 5 (1M context)" shows as "Opus 5") and is
   followed by the session's effort level.
 - Context gets an 8-block bar next to the percentage.
-- The 5-hour window shows its percentage and the time left until it resets.
+- The 5-hour window shows its percentage and the time left until it resets, read from the same
+  usage endpoint as the weekly rows, so the whole line comes from one source.
 - Weekly rows are the same server-labelled list as the default style.
 - Percentages and the bar use the same thresholds (green < 50, yellow from 50, pink from 80).
 - 256-colour ANSI on a plum pill, so it looks the same on light and dark terminal themes.
+- It is a wide line: around 140 columns once a session name and a branch are in it, against
+  about 80 for the default style, and the box, lightning, option, clock and diamond glyphs are
+  double-width in some terminals. On a narrow window, drop segments as under Customise.
 
 ## Customise
 
