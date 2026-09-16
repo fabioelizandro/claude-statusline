@@ -12,7 +12,7 @@ Uses ANSI colours, so it follows your terminal palette (pairs well with Claude's
 
 ## How it works
 
-- Model, session name and context usage come from the JSON Claude Code pipes to the script.
+- Model, effort level, session name and context usage come from the JSON Claude Code pipes to the script.
 - Weekly limits come from Anthropic's usage endpoint (`/api/oauth/usage`), the same source the
   `/usage` command and tools like claudometer use. The script reads the Claude Code OAuth token
   from the macOS keychain, caches the answer for 60 seconds and refreshes it in a background
@@ -45,7 +45,7 @@ style executable, and point `~/.claude/settings.json` at it:
 
 ### default (`statusline.sh`)
 
-The one pictured above: model, session, context and the weekly limits, in your terminal's
+The one pictured above: model with its effort level, session, context and the weekly limits, in your terminal's
 ANSI palette.
 
 ### neon (`neon.sh`)

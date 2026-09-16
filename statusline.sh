@@ -31,6 +31,8 @@ gauge() {  # $1 = label, $2 = integer percent
 }
 
 model=$(j '.model.display_name // "Claude"')
+effort=$(j '.effort.level // empty')
+[[ -n "$effort" ]] && model+=" ${R}${DIM}(${effort})"  # e.g. "Fable 5.1 (high)"
 name=$(j '.session_name // "unnamed"')
 ctx=$(j '.context_window.used_percentage // 0' | cut -d. -f1)
 
