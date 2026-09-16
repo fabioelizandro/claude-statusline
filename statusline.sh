@@ -10,7 +10,10 @@ input=$(cat)
 j() { echo "$input" | jq -r "$1"; }
 
 # Anthropic's usage endpoint, cached and refreshed in the background; sets $CACHE
-self=${BASH_SOURCE[0]}; [[ -L "$self" ]] && self=$(readlink "$self")  # installed as a symlink
+self=${BASH_SOURCE[0]}
+while [[ -L "$self" ]]; do  # installed as a symlink; follow relative and chained links
+  t=$(readlink "$self"); [[ "$t" = /* ]] && self=$t || self="$(dirname "$self")/$t"
+done
 source "$(dirname "$self")/usage.sh"
 
 R=$'\e[0m'; DIM=$'\e[2m'; BOLD=$'\e[1m'

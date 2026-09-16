@@ -9,7 +9,10 @@ input=$(cat)
 j() { echo "$input" | jq -r "$1"; }
 
 # Anthropic's usage endpoint, cached and refreshed in the background; sets $CACHE
-self=${BASH_SOURCE[0]}; [[ -L "$self" ]] && self=$(readlink "$self")  # installed as a symlink
+self=${BASH_SOURCE[0]}
+while [[ -L "$self" ]]; do  # installed as a symlink; follow relative and chained links
+  t=$(readlink "$self"); [[ "$t" = /* ]] && self=$t || self="$(dirname "$self")/$t"
+done
 source "$(dirname "$self")/usage.sh"
 
 # neon palette
@@ -52,7 +55,7 @@ ctx=$(j '.context_window.used_percentage // 0' | cut -d. -f1)
 # passes no rate limits in, falling back to what it did pass
 five=""; five_reset=""
 [[ -s "$CACHE" ]] && IFS=$'\t' read -r five five_reset < <(jq -r '
-  .limits[]? | select(.group == "session") | [ .percent, .resets_at ] | @tsv' "$CACHE")
+  .limits[]? | select(.group == "session" and .percent != null) | [ .percent, (.resets_at // "") ] | @tsv' "$CACHE")
 [[ -z "$five" ]] && {
   five=$(j '.rate_limits.five_hour.used_percentage // empty')
   five_reset=$(j '.rate_limits.five_hour.resets_at // empty')
