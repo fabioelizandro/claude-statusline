@@ -1,0 +1,90 @@
+#!/bin/bash
+# Claude Code status line — "regio" style (neon / cyberpunk)
+#   model // session // branch // ctx bar // 5h + countdown // week all // week fable ...
+# Same data sources as statusline.sh: the JSON Claude Code pipes in, plus Anthropic's usage
+# endpoint for the weekly per-model limits (cached, refreshed in the background).
+# Uses 256-colour ANSI so the neon palette looks the same on any terminal theme.
+input=$(cat)
+j() { echo "$input" | jq -r "$1"; }
+
+CACHE=~/.claude/usage-cache.json
+TTL=60
+
+fetch_usage() {
+  local tok
+  tok=$(security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null \
+        | jq -r '.claudeAiOauth.accessToken // empty') || return 1
+  [[ -z "$tok" ]] && return 1
+  local out
+  out=$(curl -s -m 10 https://api.anthropic.com/api/oauth/usage \
+        -H "Authorization: Bearer $tok" -H "anthropic-beta: oauth-2025-04-20") || return 1
+  echo "$out" | jq -e '.limits' >/dev/null 2>&1 || return 1
+  echo "$out" > "$CACHE.tmp" && mv "$CACHE.tmp" "$CACHE"
+}
+
+if [[ ! -s "$CACHE" ]]; then
+  fetch_usage
+elif (( $(date +%s) - $(stat -f %m "$CACHE") > TTL )); then
+  ( fetch_usage ) >/dev/null 2>&1 &
+  disown
+fi
+
+# neon palette
+c() { printf '\e[38;5;%sm' "$1"; }
+R=$'\e[0m'; BOLD=$'\e[1m'
+PINK=$(c 198); CYAN=$(c 51); PURPLE=$(c 135); YELLOW=$(c 227); GREEN=$(c 47); GREY=$(c 244)
+sep=" ${PURPLE}//${R} "
+
+pct_color() {
+  if   (( $1 >= 80 )); then echo "$PINK"
+  elif (( $1 >= 50 )); then echo "$YELLOW"
+  else echo "$GREEN"; fi
+}
+gauge() {  # $1 = label, $2 = integer percent
+  echo "${GREY}$1${R} $(pct_color "$2")${2}%${R}"
+}
+bar() {    # $1 = integer percent → 8 blocks
+  local n=$(( ($1 + 6) / 13 )); (( n > 8 )) && n=8
+  local filled; filled=$(printf '%*s' "$n" '' | tr ' ' '▰')
+  local empty;  empty=$(printf '%*s' $((8 - n)) '' | tr ' ' '▱')
+  echo "$(pct_color "$1")${filled}${GREY}${empty}${R}"
+}
+countdown() {  # $1 = epoch seconds → "3h07m", empty once passed
+  local left=$(( $1 - $(date +%s) ))
+  (( left > 0 )) && printf '%dh%02dm' $(( left / 3600 )) $(( left % 3600 / 60 ))
+}
+
+model=$(j '.model.display_name // "Claude"')
+name=$(j '.session_name // empty')
+dir=$(j '.workspace.current_dir // .cwd // empty')
+ctx=$(j '.context_window.used_percentage // 0' | cut -d. -f1)
+five=$(j '.rate_limits.five_hour.used_percentage // empty' | cut -d. -f1)
+five_reset=$(j '.rate_limits.five_hour.resets_at // empty')
+branch=""; [[ -n "$dir" ]] && branch=$(git -C "$dir" branch --show-current 2>/dev/null)
+
+line="${BOLD}${PINK}▞ ${model} ▚${R}"
+[[ -n "$name" ]]   && line+="${sep}${CYAN}${name}${R}"
+[[ -n "$branch" ]] && line+="${sep}${GREY}⌥${R} ${YELLOW}${branch}${R}"
+line+="${sep}${GREY}ctx${R} $(bar "$ctx") $(pct_color "$ctx")${ctx}%${R}"
+
+if [[ -n "$five" ]]; then
+  line+="${sep}$(gauge 5h "$five")"
+  left=""; [[ -n "$five_reset" ]] && left=$(countdown "$five_reset")
+  [[ -n "$left" ]] && line+=" ${GREY}⏱${R} ${CYAN}${left}${R}"
+fi
+
+if [[ -s "$CACHE" ]]; then
+  # weekly_all first, then each weekly_scoped row (Fable, ...), in the server's order
+  while IFS=$'\t' read -r label pct; do
+    [[ -z "$pct" ]] && continue
+    line+="${sep}$(gauge "week $label" "${pct%.*}")"
+  done < <(jq -r '
+    .limits[]? | select(.group == "weekly") |
+    [ (if .kind == "weekly_all" then "all" else ((.scope.model.display_name // "scoped") | ascii_downcase) end),
+      .percent ] | @tsv' "$CACHE")
+else
+  week=$(j '.rate_limits.seven_day.used_percentage // empty' | cut -d. -f1)
+  [[ -n "$week" ]] && line+="${sep}$(gauge "week all" "$week")"
+fi
+
+printf '%s\n' "$line"

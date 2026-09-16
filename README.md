@@ -29,7 +29,8 @@ Requires macOS, `jq` and `curl`. Claude Code must be logged in with a claude.ai 
 
 ```
 git clone git@github.com:fabioelizandro/claude-statusline.git ~/claude-statusline
-~/claude-statusline/install.sh
+~/claude-statusline/install.sh          # default style
+~/claude-statusline/install.sh regio    # neon style, see below
 ```
 
 Or set it up by hand: copy `statusline.sh` somewhere, make it executable, and add to
@@ -39,7 +40,29 @@ Or set it up by hand: copy `statusline.sh` somewhere, make it executable, and ad
 { "statusLine": { "type": "command", "command": "/path/to/statusline.sh" } }
 ```
 
+## Styles
+
+### default (`statusline.sh`)
+
+The one pictured above: model, session, context and the weekly limits, in your terminal's
+ANSI palette.
+
+### regio (`regio.sh`)
+
+A neon take on the same data, plus the git branch and the 5-hour window:
+
+```
+▞ Fable 5.1 ▚ // Custom status message // ⌥ master // ctx ▰▰▱▱▱▱▱▱ 10% // 5h 6% ⏱ 3h02m // week all 35% // week fable 49%
+```
+
+- Hot-pink model, cyan session, yellow branch, purple `//` separators.
+- Context gets an 8-block bar next to the percentage.
+- The 5-hour window shows its percentage and the time left until it resets.
+- Weekly rows are the same server-labelled list as the default style.
+- Percentages and the bar use the same thresholds (green < 50, yellow from 50, pink from 80).
+- 256-colour ANSI, so it looks the same on any terminal theme rather than following it.
+
 ## Customise
 
-Thresholds and colours are the `pct_color` function at the top of the script. Segments are
-built into `$line` near the bottom; remove or reorder them there.
+In either script, thresholds and colours are the `pct_color` function near the top. Segments
+are built into `$line` near the bottom; remove or reorder them there.
