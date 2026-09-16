@@ -29,7 +29,7 @@ gauge() {  # $1 = label, $2 = integer percent
   echo "${GREY}$1${R} $(pct_color "$2")${2}%${R}"
 }
 bar() {    # $1 = integer percent → 8 blocks
-  local n=$(( ($1 + 6) / 13 )); (( n > 8 )) && n=8
+  local n=$(( ($1 * 8 + 50) / 100 )); (( n > 8 )) && n=8
   local filled; filled=$(printf '%*s' "$n" '' | tr ' ' '▰')
   local empty;  empty=$(printf '%*s' $((8 - n)) '' | tr ' ' '▱')
   echo "$(pct_color "$1")${filled}${GREY}${empty}${R}"
