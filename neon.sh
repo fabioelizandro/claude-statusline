@@ -48,8 +48,16 @@ effort=$(j '.effort.level // empty')
 name=$(j '.session_name // empty')
 dir=$(j '.workspace.current_dir // .cwd // empty')
 ctx=$(j '.context_window.used_percentage // 0' | cut -d. -f1)
-five=$(j '.rate_limits.five_hour.used_percentage // empty' | cut -d. -f1)
-five_reset=$(j '.rate_limits.five_hour.resets_at // empty')
+# the 5-hour window: the usage endpoint's "session" row, which is there even when Claude Code
+# passes no rate limits in, falling back to what it did pass
+five=""; five_reset=""
+[[ -s "$CACHE" ]] && IFS=$'\t' read -r five five_reset < <(jq -r '
+  .limits[]? | select(.group == "session") | [ .percent, .resets_at ] | @tsv' "$CACHE")
+[[ -z "$five" ]] && {
+  five=$(j '.rate_limits.five_hour.used_percentage // empty')
+  five_reset=$(j '.rate_limits.five_hour.resets_at // empty')
+}
+five=${five%.*}
 branch=""; [[ -n "$dir" ]] && branch=$(git -C "$dir" branch --show-current 2>/dev/null)
 
 line="${BG} ${BOLD}${PINK}▞ ${model} ▚${R}"
