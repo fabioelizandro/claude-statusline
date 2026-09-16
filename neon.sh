@@ -1,6 +1,6 @@
 #!/bin/bash
 # Claude Code status line — "neon" style
-#   model + effort // session // branch // ctx bar // 5h + countdown // week all // week fable ...
+#   model + effort [session] branch ◆ ctx bar ◆ 5h + countdown ◆ week all ◆ week fable ...
 # Same data sources as statusline.sh: the JSON Claude Code pipes in, plus Anthropic's usage
 # endpoint for the weekly per-model limits (cached, refreshed in the background).
 # Uses 256-colour ANSI on a plum pill, so the neon palette reads the same on light and
@@ -36,7 +36,7 @@ BG=$'\e[48;5;53m'           # plum pill behind the whole row
 R=$'\e[0m'"$BG"; BOLD=$'\e[1m'   # every reset re-applies the background
 END=$'\e[0m'
 PINK=$(c 198); CYAN=$(c 51); PURPLE=$(c 141); YELLOW=$(c 227); GREEN=$(c 47); GREY=$(c 252)
-sep=" ${PURPLE}//${R} "
+sep=" ${PURPLE}◆${R} "
 
 pct_color() {
   if   (( $1 >= 80 )); then echo "$PINK"
@@ -68,9 +68,11 @@ branch=""; [[ -n "$dir" ]] && branch=$(git -C "$dir" branch --show-current 2>/de
 
 line="${BG} ${BOLD}${PINK}▞ ${model} ▚${R}"
 [[ -n "$effort" ]] && line+=" ${GREY}⚡${R} ${YELLOW}${effort}${R}"
-[[ -n "$name" ]]   && line+="${sep}${CYAN}${name}${R}"
-[[ -n "$branch" ]] && line+="${sep}${GREY}⌥${R} ${YELLOW}${branch}${R}"
-line+="${sep}${GREY}ctx${R} $(bar "$ctx") $(pct_color "$ctx")${ctx}%${R}"
+# the brackets act as the delimiter around the session name: no separator before or after it
+nsep=$sep
+[[ -n "$name" ]]   && { line+=" ${GREY}[${CYAN}${name}${GREY}]${R}"; nsep=" "; }
+[[ -n "$branch" ]] && { line+="${nsep}${GREY}⌥${R} ${YELLOW}${branch}${R}"; nsep=$sep; }
+line+="${nsep}${GREY}ctx${R} $(bar "$ctx") $(pct_color "$ctx")${ctx}%${R}"
 
 if [[ -n "$five" ]]; then
   line+="${sep}$(gauge 5h "$five")"
