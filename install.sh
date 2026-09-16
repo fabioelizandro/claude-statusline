@@ -1,12 +1,12 @@
 #!/bin/bash
 # Link a status line style into ~/.claude and register it in Claude Code's settings.
-# Usage: ./install.sh [style]   (style = default | regio; see README "Styles")
+# Usage: ./install.sh [style]   (style = default | neon; see README "Styles")
 set -e
 D="$(cd "$(dirname "$0")" && pwd)"
 case "${1:-default}" in
   default) SRC="$D/statusline.sh" ;;
-  regio)   SRC="$D/regio.sh" ;;
-  *) echo "unknown style: $1 (expected: default, regio)" >&2; exit 1 ;;
+  neon)    SRC="$D/neon.sh" ;;
+  *) echo "unknown style: $1 (expected: default, neon)" >&2; exit 1 ;;
 esac
 mkdir -p ~/.claude
 ln -sfn "$SRC" ~/.claude/statusline.sh

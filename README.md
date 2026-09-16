@@ -30,7 +30,7 @@ Requires macOS, `jq` and `curl`. Claude Code must be logged in with a claude.ai 
 ```
 git clone git@github.com:fabioelizandro/claude-statusline.git ~/claude-statusline
 ~/claude-statusline/install.sh          # default style
-~/claude-statusline/install.sh regio    # neon style, see below
+~/claude-statusline/install.sh neon     # neon style, see below
 ```
 
 Or set it up by hand: copy `statusline.sh` somewhere, make it executable, and add to
@@ -47,11 +47,11 @@ Or set it up by hand: copy `statusline.sh` somewhere, make it executable, and ad
 The one pictured above: model, session, context and the weekly limits, in your terminal's
 ANSI palette.
 
-### regio (`regio.sh`)
+### neon (`neon.sh`)
 
 A neon take on the same data, plus the git branch and the 5-hour window:
 
-<img alt="regio style: model, session, branch, context bar, 5-hour window with time left, weekly all and weekly fable" src="regio.png" />
+<img alt="neon style: model, session, branch, context bar, 5-hour window with time left, weekly all and weekly fable" src="neon.png" />
 
 - Hot-pink model, cyan session, yellow branch, lilac `//` separators, all on a plum pill.
 - The model name drops its parenthetical (so "Opus 5 (1M context)" shows as "Opus 5") and is

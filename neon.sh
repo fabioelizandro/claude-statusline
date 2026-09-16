@@ -1,5 +1,5 @@
 #!/bin/bash
-# Claude Code status line — "regio" style (neon / cyberpunk)
+# Claude Code status line — "neon" style
 #   model + effort // session // branch // ctx bar // 5h + countdown // week all // week fable ...
 # Same data sources as statusline.sh: the JSON Claude Code pipes in, plus Anthropic's usage
 # endpoint for the weekly per-model limits (cached, refreshed in the background).
