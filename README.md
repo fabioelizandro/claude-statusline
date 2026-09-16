@@ -51,9 +51,7 @@ ANSI palette.
 
 A neon take on the same data, plus the git branch and the 5-hour window:
 
-```
-▞ Fable 5.1 ▚ // Custom status message // ⌥ master // ctx ▰▰▱▱▱▱▱▱ 10% // 5h 6% ⏱ 3h02m // week all 35% // week fable 49%
-```
+<img alt="regio style: model, session, branch, context bar, 5-hour window with time left, weekly all and weekly fable" src="regio.png" />
 
 - Hot-pink model, cyan session, yellow branch, purple `//` separators.
 - Context gets an 8-block bar next to the percentage.
