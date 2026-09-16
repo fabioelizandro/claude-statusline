@@ -32,7 +32,7 @@ fi
 
 # neon palette
 c() { printf '\e[38;5;%sm' "$1"; }
-BG=$'\e[48;5;234m'          # near-black pill behind the whole row
+BG=$'\e[48;5;237m'          # charcoal pill behind the whole row
 R=$'\e[0m'"$BG"; BOLD=$'\e[1m'   # every reset re-applies the background
 END=$'\e[0m'
 PINK=$(c 198); CYAN=$(c 51); PURPLE=$(c 135); YELLOW=$(c 227); GREEN=$(c 47); GREY=$(c 246)
