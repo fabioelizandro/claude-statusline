@@ -4,9 +4,7 @@ A status line for [Claude Code](https://docs.claude.com/en/docs/claude-code) tha
 weekly usage limits, including the per-model ones (Fable, Opus, ...) that Claude Code itself
 does not always pass to status line scripts.
 
-```
-Fable 5.1 │ my-session │ ctx 42% │ week all 38% │ week fable 61%
-```
+<img width="882" height="141" alt="Screenshot 2026-09-16 at 1 41 56 pm" src="https://github.com/user-attachments/assets/118096ef-0ca3-4dd8-bb4f-f9cb17fcfc9d" />
 
 Every percentage is coloured: green below 50%, yellow from 50%, red from 80%.
 Uses ANSI colours, so it follows your terminal palette (pairs well with Claude's `light-ansi` /
