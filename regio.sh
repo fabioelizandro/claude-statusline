@@ -3,7 +3,8 @@
 #   model // session // branch // ctx bar // 5h + countdown // week all // week fable ...
 # Same data sources as statusline.sh: the JSON Claude Code pipes in, plus Anthropic's usage
 # endpoint for the weekly per-model limits (cached, refreshed in the background).
-# Uses 256-colour ANSI so the neon palette looks the same on any terminal theme.
+# Uses 256-colour ANSI on a dark background pill, so the neon palette reads the same on light
+# and dark terminal themes.
 input=$(cat)
 j() { echo "$input" | jq -r "$1"; }
 
@@ -31,8 +32,10 @@ fi
 
 # neon palette
 c() { printf '\e[38;5;%sm' "$1"; }
-R=$'\e[0m'; BOLD=$'\e[1m'
-PINK=$(c 198); CYAN=$(c 51); PURPLE=$(c 135); YELLOW=$(c 227); GREEN=$(c 47); GREY=$(c 244)
+BG=$'\e[48;5;234m'          # near-black pill behind the whole row
+R=$'\e[0m'"$BG"; BOLD=$'\e[1m'   # every reset re-applies the background
+END=$'\e[0m'
+PINK=$(c 198); CYAN=$(c 51); PURPLE=$(c 135); YELLOW=$(c 227); GREEN=$(c 47); GREY=$(c 246)
 sep=" ${PURPLE}//${R} "
 
 pct_color() {
@@ -62,7 +65,7 @@ five=$(j '.rate_limits.five_hour.used_percentage // empty' | cut -d. -f1)
 five_reset=$(j '.rate_limits.five_hour.resets_at // empty')
 branch=""; [[ -n "$dir" ]] && branch=$(git -C "$dir" branch --show-current 2>/dev/null)
 
-line="${BOLD}${PINK}▞ ${model} ▚${R}"
+line="${BG} ${BOLD}${PINK}▞ ${model} ▚${R}"
 [[ -n "$name" ]]   && line+="${sep}${CYAN}${name}${R}"
 [[ -n "$branch" ]] && line+="${sep}${GREY}⌥${R} ${YELLOW}${branch}${R}"
 line+="${sep}${GREY}ctx${R} $(bar "$ctx") $(pct_color "$ctx")${ctx}%${R}"
@@ -87,4 +90,4 @@ else
   [[ -n "$week" ]] && line+="${sep}$(gauge "week all" "$week")"
 fi
 
-printf '%s\n' "$line"
+printf '%s \n' "$line$END"
