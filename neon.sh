@@ -88,4 +88,4 @@ else
   [[ -n "$week" ]] && line+="${sep}$(gauge "week all" "$week")"
 fi
 
-printf '%s \n' "$line$END"
+printf '%s %s\n' "$line" "$END"   # the trailing pad stays inside the pill
