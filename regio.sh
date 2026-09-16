@@ -1,6 +1,6 @@
 #!/bin/bash
 # Claude Code status line — "regio" style (neon / cyberpunk)
-#   model // session // branch // ctx bar // 5h + countdown // week all // week fable ...
+#   model + effort // session // branch // ctx bar // 5h + countdown // week all // week fable ...
 # Same data sources as statusline.sh: the JSON Claude Code pipes in, plus Anthropic's usage
 # endpoint for the weekly per-model limits (cached, refreshed in the background).
 # Uses 256-colour ANSI on a plum pill, so the neon palette reads the same on light and
@@ -57,7 +57,8 @@ countdown() {  # $1 = epoch seconds → "3h07m", empty once passed
   (( left > 0 )) && printf '%dh%02dm' $(( left / 3600 )) $(( left % 3600 / 60 ))
 }
 
-model=$(j '.model.display_name // "Claude"')
+model=$(j '.model.display_name // "Claude"' | sed 's/ *(.*)//')   # drop "(1M context)" etc.
+effort=$(j '.effort.level // empty')
 name=$(j '.session_name // empty')
 dir=$(j '.workspace.current_dir // .cwd // empty')
 ctx=$(j '.context_window.used_percentage // 0' | cut -d. -f1)
@@ -66,6 +67,7 @@ five_reset=$(j '.rate_limits.five_hour.resets_at // empty')
 branch=""; [[ -n "$dir" ]] && branch=$(git -C "$dir" branch --show-current 2>/dev/null)
 
 line="${BG} ${BOLD}${PINK}▞ ${model} ▚${R}"
+[[ -n "$effort" ]] && line+=" ${GREY}⚡${R} ${YELLOW}${effort}${R}"
 [[ -n "$name" ]]   && line+="${sep}${CYAN}${name}${R}"
 [[ -n "$branch" ]] && line+="${sep}${GREY}⌥${R} ${YELLOW}${branch}${R}"
 line+="${sep}${GREY}ctx${R} $(bar "$ctx") $(pct_color "$ctx")${ctx}%${R}"

@@ -54,6 +54,8 @@ A neon take on the same data, plus the git branch and the 5-hour window:
 <img alt="regio style: model, session, branch, context bar, 5-hour window with time left, weekly all and weekly fable" src="regio.png" />
 
 - Hot-pink model, cyan session, yellow branch, lilac `//` separators, all on a plum pill.
+- The model name drops its parenthetical (so "Opus 5 (1M context)" shows as "Opus 5") and is
+  followed by the session's effort level.
 - Context gets an 8-block bar next to the percentage.
 - The 5-hour window shows its percentage and the time left until it resets.
 - Weekly rows are the same server-labelled list as the default style.
