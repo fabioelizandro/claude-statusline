@@ -34,8 +34,12 @@ bar() {    # $1 = integer percent → 8 blocks
   local empty;  empty=$(printf '%*s' $((8 - n)) '' | tr ' ' '▱')
   echo "$(pct_color "$1")${filled}${GREY}${empty}${R}"
 }
-countdown() {  # $1 = epoch seconds → "3h07m", empty once passed
-  local left=$(( $1 - $(date +%s) ))
+countdown() {  # epoch seconds, or an ISO-8601 UTC time → "3h07m"; empty once the window has passed
+  local at=$1
+  [[ $at =~ ^[0-9]+$ ]] || at=$(jq -rn --arg t "$at" \
+    '$t | sub("\\.[0-9]+"; "") | sub("\\+00:00$"; "Z") | try fromdateiso8601 catch empty')
+  [[ -z $at ]] && return
+  local left=$(( at - $(date +%s) ))
   (( left > 0 )) && printf '%dh%02dm' $(( left / 3600 )) $(( left % 3600 / 60 ))
 }
 
