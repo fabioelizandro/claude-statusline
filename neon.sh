@@ -8,27 +8,9 @@
 input=$(cat)
 j() { echo "$input" | jq -r "$1"; }
 
-CACHE=~/.claude/usage-cache.json
-TTL=60
-
-fetch_usage() {
-  local tok
-  tok=$(security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null \
-        | jq -r '.claudeAiOauth.accessToken // empty') || return 1
-  [[ -z "$tok" ]] && return 1
-  local out
-  out=$(curl -s -m 10 https://api.anthropic.com/api/oauth/usage \
-        -H "Authorization: Bearer $tok" -H "anthropic-beta: oauth-2025-04-20") || return 1
-  echo "$out" | jq -e '.limits' >/dev/null 2>&1 || return 1
-  echo "$out" > "$CACHE.tmp" && mv "$CACHE.tmp" "$CACHE"
-}
-
-if [[ ! -s "$CACHE" ]]; then
-  fetch_usage
-elif (( $(date +%s) - $(stat -f %m "$CACHE") > TTL )); then
-  ( fetch_usage ) >/dev/null 2>&1 &
-  disown
-fi
+# Anthropic's usage endpoint, cached and refreshed in the background; sets $CACHE
+self=${BASH_SOURCE[0]}; [[ -L "$self" ]] && self=$(readlink "$self")  # installed as a symlink
+source "$(dirname "$self")/usage.sh"
 
 # neon palette
 c() { printf '\e[38;5;%sm' "$1"; }
