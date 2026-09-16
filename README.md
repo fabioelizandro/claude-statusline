@@ -53,12 +53,12 @@ A neon take on the same data, plus the git branch and the 5-hour window:
 
 <img alt="regio style: model, session, branch, context bar, 5-hour window with time left, weekly all and weekly fable" src="regio.png" />
 
-- Hot-pink model, cyan session, yellow branch, purple `//` separators.
+- Hot-pink model, cyan session, yellow branch, lilac `//` separators, all on a plum pill.
 - Context gets an 8-block bar next to the percentage.
 - The 5-hour window shows its percentage and the time left until it resets.
 - Weekly rows are the same server-labelled list as the default style.
 - Percentages and the bar use the same thresholds (green < 50, yellow from 50, pink from 80).
-- 256-colour ANSI on a dark-grey pill, so it looks the same on light and dark terminal themes.
+- 256-colour ANSI on a plum pill, so it looks the same on light and dark terminal themes.
 
 ## Customise
 

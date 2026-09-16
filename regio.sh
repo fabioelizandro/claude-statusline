@@ -3,7 +3,7 @@
 #   model // session // branch // ctx bar // 5h + countdown // week all // week fable ...
 # Same data sources as statusline.sh: the JSON Claude Code pipes in, plus Anthropic's usage
 # endpoint for the weekly per-model limits (cached, refreshed in the background).
-# Uses 256-colour ANSI on a dark-grey pill, so the neon palette reads the same on light and
+# Uses 256-colour ANSI on a plum pill, so the neon palette reads the same on light and
 # dark terminal themes.
 input=$(cat)
 j() { echo "$input" | jq -r "$1"; }
@@ -32,7 +32,7 @@ fi
 
 # neon palette
 c() { printf '\e[38;5;%sm' "$1"; }
-BG=$'\e[48;5;240m'          # dark-grey pill behind the whole row
+BG=$'\e[48;5;53m'           # plum pill behind the whole row
 R=$'\e[0m'"$BG"; BOLD=$'\e[1m'   # every reset re-applies the background
 END=$'\e[0m'
 PINK=$(c 198); CYAN=$(c 51); PURPLE=$(c 141); YELLOW=$(c 227); GREEN=$(c 47); GREY=$(c 252)
